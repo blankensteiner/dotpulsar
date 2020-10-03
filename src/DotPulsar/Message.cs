@@ -21,12 +21,30 @@ namespace DotPulsar
     using System.Linq;
 
     /// <summary>
-    /// The message received by consumers and readers.
+    /// The message abstraction used in client.
     /// </summary>
     public sealed class Message
     {
         private readonly List<KeyValue> _keyValues;
         private IReadOnlyDictionary<string, string>? _properties;
+
+        /// <summary>
+        /// Constructor for producer.
+        /// </summary>
+        internal Message(Internal.PulsarApi.MessageMetadata metadata,
+            ReadOnlySequence<byte> data)
+        {
+            ProducerName = metadata.ProducerName;
+            PublishTime = metadata.PublishTime;
+            Data = data;
+
+            EventTime = metadata.EventTime;
+            HasBase64EncodedKey = metadata.PartitionKeyB64Encoded;
+            Key = metadata.PartitionKey;
+            SequenceId = metadata.SequenceId;
+            OrderingKey = metadata.OrderingKey;
+            _keyValues = metadata.Properties;
+        }
 
         internal Message(
             MessageId messageId,
@@ -61,10 +79,28 @@ namespace DotPulsar
             }
         }
 
+        public SingleMessageMetadata GetSingleMessageMetadata()
+        {
+            var singleMessageMetadata = new SingleMessageMetadata
+            {
+                EventTime = EventTime,
+                PartitionKeyB64Encoded = HasBase64EncodedKey,
+                PartitionKey = Key,
+                OrderingKey = OrderingKey,
+                SequenceId = SequenceId,
+                PayloadSize = (int) Data.Length
+            };
+            foreach (var kv in _keyValues)
+            {
+                singleMessageMetadata.Properties.Add(kv);
+            }
+            return singleMessageMetadata;
+        }
+
         /// <summary>
         /// The id of the message.
         /// </summary>
-        public MessageId MessageId { get; }
+        public MessageId? MessageId { get; }
 
         /// <summary>
         /// The raw payload of the message.

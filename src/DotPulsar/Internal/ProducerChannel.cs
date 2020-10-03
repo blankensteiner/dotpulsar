@@ -15,9 +15,9 @@
 namespace DotPulsar.Internal
 {
     using Abstractions;
+    using DotPulsar.Internal.PulsarApi;
     using Extensions;
     using Microsoft.Extensions.ObjectPool;
-    using PulsarApi;
     using System;
     using System.Buffers;
     using System.Threading;
@@ -88,7 +88,7 @@ namespace DotPulsar.Internal
                 sendPackage.Command = new CommandSend
                 {
                     ProducerId = _id,
-                    NumMessages = 1
+                    NumMessages = metadata.NumMessagesInBatch
                 };
             }
 

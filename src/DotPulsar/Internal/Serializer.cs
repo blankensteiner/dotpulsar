@@ -17,6 +17,7 @@ namespace DotPulsar.Internal
     using PulsarApi;
     using System;
     using System.Buffers;
+    using System.Collections.Generic;
     using System.IO;
 
     public static class Serializer
@@ -39,6 +40,18 @@ namespace DotPulsar.Internal
                 .Append(commandSizeBytes)
                 .Append(commandBytes)
                 .Build();
+        }
+
+        public static ReadOnlySequence<byte> Serialize(Queue<Message> messages)
+        {
+            var sb = new SequenceBuilder<byte>();
+            foreach (var singleMessage in messages)
+            {
+                var metadataBytes = Serialize(singleMessage.GetSingleMessageMetadata());
+                var metadataSizeBytes = ToBigEndianBytes((uint) metadataBytes.Length);
+                sb.Append(metadataSizeBytes).Append(metadataBytes).Append(singleMessage.Data);
+            }
+            return sb.Build();
         }
 
         public static ReadOnlySequence<byte> Serialize(BaseCommand command, MessageMetadata metadata, ReadOnlySequence<byte> payload)
