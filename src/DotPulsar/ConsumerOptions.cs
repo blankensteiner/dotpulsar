@@ -44,6 +44,16 @@ namespace DotPulsar
         /// </summary>
         public static readonly SubscriptionType DefaultSubscriptionType = SubscriptionType.Exclusive;
 
+        /// <summary>
+        /// Whether to auto subscribe to new partitions.
+        /// </summary>
+        public const bool DefaultAutoUpdatePartitions = true;
+
+        /// <summary>
+        /// The default interval to check for new partitions to subscribe to.
+        /// </summary>
+        public const int DefaultAutoUpdatePartitionsInterval = 60;
+
         public ConsumerOptions(string subscriptionName, string topic)
         {
             InitialPosition = DefaultInitialPosition;
@@ -52,7 +62,23 @@ namespace DotPulsar
             ReadCompacted = DefaultReadCompacted;
             SubscriptionType = DefaultSubscriptionType;
             SubscriptionName = subscriptionName;
+            AutoUpdatePartitions = DefaultAutoUpdatePartitions;
+            AutoUpdatePartitionsInterval = DefaultAutoUpdatePartitionsInterval;
             Topic = topic;
+        }
+
+        public ConsumerOptions(ConsumerOptions options, string topic, uint messagePrefetchCount)
+        {
+            Topic = topic;
+            MessagePrefetchCount = messagePrefetchCount;
+
+            InitialPosition = options.InitialPosition;
+            PriorityLevel = options.PriorityLevel;
+            ReadCompacted = options.ReadCompacted;
+            SubscriptionType = options.SubscriptionType;
+            SubscriptionName = options.SubscriptionName;
+            AutoUpdatePartitions = options.AutoUpdatePartitions;
+            AutoUpdatePartitionsInterval = options.AutoUpdatePartitionsInterval;
         }
 
         /// <summary>
@@ -94,5 +120,15 @@ namespace DotPulsar
         /// Set the topic for this consumer. This is required.
         /// </summary>
         public string Topic { get; set; }
+
+        /// <summary>
+        /// True if you want new partitiones to be consumed, false otherwise
+        /// </summary>
+        public bool AutoUpdatePartitions { get; set; }
+
+        /// <summary>
+        /// Time interval which determines frequency with which we are going to check for new partitions (in seconds).
+        /// </summary>
+        public int AutoUpdatePartitionsInterval { get; set; }
     }
 }

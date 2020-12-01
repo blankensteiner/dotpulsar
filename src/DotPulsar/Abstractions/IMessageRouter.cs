@@ -12,29 +12,16 @@
  * limitations under the License.
  */
 
-namespace DotPulsar
+namespace DotPulsar.Abstractions
 {
-    using Abstractions;
-
     /// <summary>
-    /// Representation of a producer state change.
+    /// A message routing abstraction
     /// </summary>
-    public sealed class ProducerStateChanged
+    public interface IMessageRouter
     {
-        public ProducerStateChanged(IProducer producer, ProducerState producerState)
-        {
-            Producer = producer;
-            ProducerState = producerState;
-        }
-
         /// <summary>
-        /// The producer that changed state.
+        /// Choose a partition.
         /// </summary>
-        public IProducer Producer { get; }
-
-        /// <summary>
-        /// The state that it changed to.
-        /// </summary>
-        public ProducerState ProducerState { get; }
+        int ChoosePartition(MessageMetadata? messageMetadata, PartitionedTopicMetadata partitionedTopic);
     }
 }

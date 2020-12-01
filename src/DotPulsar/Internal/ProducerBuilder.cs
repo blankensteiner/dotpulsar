@@ -16,6 +16,7 @@ namespace DotPulsar.Internal
 {
     using DotPulsar.Abstractions;
     using DotPulsar.Exceptions;
+    using System;
 
     public sealed class ProducerBuilder : IProducerBuilder
     {
@@ -23,11 +24,15 @@ namespace DotPulsar.Internal
         private string? _producerName;
         private ulong _initialSequenceId;
         private string? _topic;
+        private IMessageRouter? _messageRouter;
+        private bool _autoUpdatePartitions = true;
+        private TimeSpan _autoUpdatePartitionsInterval;
 
         public ProducerBuilder(IPulsarClient pulsarClient)
         {
             _pulsarClient = pulsarClient;
             _initialSequenceId = ProducerOptions.DefaultInitialSequenceId;
+            _autoUpdatePartitionsInterval = TimeSpan.FromSeconds(ProducerOptions.DefaultAutoUpdatePartitionsIntervalInSecond);
         }
 
         public IProducerBuilder ProducerName(string name)
@@ -48,6 +53,24 @@ namespace DotPulsar.Internal
             return this;
         }
 
+        public IProducerBuilder MessageRouter(IMessageRouter messageRouter)
+        {
+            _messageRouter = messageRouter;
+            return this;
+        }
+
+        public IProducerBuilder AutoUpdatePartitions(bool autoUpdate)
+        {
+            _autoUpdatePartitions = autoUpdate;
+            return this;
+        }
+
+        public IProducerBuilder AutoUpdatePartitionsInterval(TimeSpan interval)
+        {
+            _autoUpdatePartitionsInterval = interval;
+            return this;
+        }
+
         public IProducer Create()
         {
             if (string.IsNullOrEmpty(_topic))
@@ -56,8 +79,12 @@ namespace DotPulsar.Internal
             var options = new ProducerOptions(_topic!)
             {
                 InitialSequenceId = _initialSequenceId,
-                ProducerName = _producerName
+                ProducerName = _producerName,
+                AutoUpdatePartitions = _autoUpdatePartitions,
+                AutoUpdatePartitionsInterval = _autoUpdatePartitionsInterval
             };
+
+            if (_messageRouter != null) options.MessageRouter = _messageRouter;
 
             return _pulsarClient.CreateProducer(options);
         }

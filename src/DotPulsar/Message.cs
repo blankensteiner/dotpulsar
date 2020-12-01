@@ -34,7 +34,8 @@ namespace DotPulsar
             IReadOnlyDictionary<string, string> properties,
             bool hasBase64EncodedKey,
             string? key,
-            byte[]? orderingKey)
+            byte[]? orderingKey,
+            int numMessagesInBatch)
         {
             MessageId = messageId;
             Data = data;
@@ -47,6 +48,7 @@ namespace DotPulsar
             HasBase64EncodedKey = hasBase64EncodedKey;
             Key = key;
             OrderingKey = orderingKey;
+            NumMessagesInBatch = numMessagesInBatch;
         }
 
         /// <summary>
@@ -73,6 +75,11 @@ namespace DotPulsar
         /// The redelivery count (maintained by the broker) of the message.
         /// </summary>
         public uint RedeliveryCount { get; }
+
+        /// <summary>
+        /// Number of messages in a batch this message belongs to. 0 if message does't belong to a batch.
+        /// </summary>
+        public int NumMessagesInBatch { get; }
 
         /// <summary>
         /// Check whether the message has an event time.

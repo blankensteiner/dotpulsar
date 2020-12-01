@@ -14,27 +14,19 @@
 
 namespace DotPulsar
 {
-    using Abstractions;
-
     /// <summary>
-    /// Representation of a producer state change.
+    /// Metadata of a topic that can be used for message routing.
     /// </summary>
-    public sealed class ProducerStateChanged
+    public sealed class PartitionedTopicMetadata
     {
-        public ProducerStateChanged(IProducer producer, ProducerState producerState)
+        /// <summary>
+        /// the number of partitions per topic.
+        /// </summary>
+        public int Partitions { get; }
+
+        public PartitionedTopicMetadata(int partitions)
         {
-            Producer = producer;
-            ProducerState = producerState;
+            Partitions = partitions;
         }
-
-        /// <summary>
-        /// The producer that changed state.
-        /// </summary>
-        public IProducer Producer { get; }
-
-        /// <summary>
-        /// The state that it changed to.
-        /// </summary>
-        public ProducerState ProducerState { get; }
     }
 }

@@ -14,20 +14,29 @@
 
 namespace DotPulsar
 {
+    using DotPulsar.Abstractions;
+    using System;
+
     /// <summary>
     /// The producer building options.
     /// </summary>
-    public sealed class ProducerOptions
+    public sealed class ProducerOptions : ICloneable
     {
         /// <summary>
         /// The default initial sequence id.
         /// </summary>
         public static readonly ulong DefaultInitialSequenceId = 0;
 
+        /// <summary>
+        /// The default new partitions topics update interval.
+        /// </summary>
+        public const double DefaultAutoUpdatePartitionsIntervalInSecond = 60;
+
         public ProducerOptions(string topic)
         {
             InitialSequenceId = DefaultInitialSequenceId;
             Topic = topic;
+            MessageRouter = new RoundRobinPartitionRouter();
         }
 
         /// <summary>
@@ -44,5 +53,30 @@ namespace DotPulsar
         /// Set the topic for this producer. This is required.
         /// </summary>
         public string Topic { get; set; }
+
+        /// <summary>
+        /// Set the message router. The default router is Round Robind routing mode.
+        /// </summary>
+        public IMessageRouter MessageRouter { get; set; }
+
+
+        /// <summary>
+        /// Whether to auto discover the partition configuration changes
+        /// </summary>
+        public bool AutoUpdatePartitions { get; set; }
+
+        /// <summary>
+        /// The interval of updating partitions
+        /// </summary>
+        public TimeSpan AutoUpdatePartitionsInterval { get; set; }
+
+        public object Clone()
+        {
+            return new ProducerOptions(Topic)
+            {
+                ProducerName = ProducerName,
+                InitialSequenceId = InitialSequenceId
+            };
+        }
     }
 }

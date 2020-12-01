@@ -57,7 +57,8 @@ namespace DotPulsar.Internal
                 properties: FromKeyValueList(metadata.Properties),
                 hasBase64EncodedKey: metadata.PartitionKeyB64Encoded,
                 key: metadata.PartitionKey,
-                orderingKey: metadata.OrderingKey);
+                orderingKey: metadata.OrderingKey,
+                numMessagesInBatch: metadata.NumMessagesInBatch);
         }
 
         public static Message Create(
@@ -78,7 +79,8 @@ namespace DotPulsar.Internal
                 properties: FromKeyValueList(singleMetadata.Properties),
                 hasBase64EncodedKey: singleMetadata.PartitionKeyB64Encoded,
                 key: singleMetadata.PartitionKey,
-                orderingKey: singleMetadata.OrderingKey);
+                orderingKey: singleMetadata.OrderingKey,
+                numMessagesInBatch: metadata.NumMessagesInBatch);
         }
 
         /// <summary>
@@ -95,6 +97,7 @@ namespace DotPulsar.Internal
             IReadOnlyDictionary<string, string> properties,
             bool hasBase64EncodedKey,
             string? key,
-            byte[]? orderingKey) => new Message(messageId, data, producerName, sequenceId, redeliveryCount, eventTime, publishTime, properties, hasBase64EncodedKey, key, orderingKey);
+            byte[]? orderingKey,
+            int numMessagesInBatch) => new Message(messageId, data, producerName, sequenceId, redeliveryCount, eventTime, publishTime, properties, hasBase64EncodedKey, key, orderingKey, numMessagesInBatch);
     }
 }

@@ -14,6 +14,8 @@
 
 namespace DotPulsar.Abstractions
 {
+    using System;
+
     /// <summary>
     /// A producer building abstraction.
     /// </summary>
@@ -33,6 +35,28 @@ namespace DotPulsar.Abstractions
         /// Set the topic for this producer. This is required.
         /// </summary>
         IProducerBuilder Topic(string topic);
+
+        /// <summary>
+        /// Set the message router for this producer. This is optional.
+        /// </summary>
+        IProducerBuilder MessageRouter(IMessageRouter router);
+
+        /// <summary>
+        /// If enabled, partitioned producer will automatically discover new partitions at runtime.
+        /// Only for the partitioned producer implementation.
+        /// Default is true.
+        /// </summary>
+        /// <param name="autoUpdate">Whether to auto discover the partition configuration changes</param>
+        /// <returns>The producer builder instance</returns>
+        IProducerBuilder AutoUpdatePartitions(bool autoUpdate);
+
+        /// <summary>
+        /// Set the interval of updating partitions.
+        /// Only for the partitioned producer implementation. 
+        /// </summary>
+        /// <param name="interval">The interval of updating partitions</param>
+        /// <returns>The producer builder instance</returns>
+        IProducerBuilder AutoUpdatePartitionsInterval(TimeSpan interval);
 
         /// <summary>
         /// Create the producer.
