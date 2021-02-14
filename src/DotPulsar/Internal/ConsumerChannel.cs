@@ -24,7 +24,7 @@ namespace DotPulsar.Internal
     public sealed class ConsumerChannel : IConsumerChannel
     {
         private readonly ulong _id;
-        private readonly AsyncQueue<MessagePackage> _queue;
+        private readonly MessageQueue _queue;
         private readonly IConnection _connection;
         private readonly BatchHandler _batchHandler;
         private readonly CommandFlow _cachedCommandFlow;
@@ -35,7 +35,7 @@ namespace DotPulsar.Internal
         public ConsumerChannel(
             ulong id,
             uint messagePrefetchCount,
-            AsyncQueue<MessagePackage> queue,
+            MessageQueue queue,
             IConnection connection,
             BatchHandler batchHandler)
         {
@@ -108,6 +108,9 @@ namespace DotPulsar.Internal
             }
 
             command.ConsumerId = _id;
+
+            _queue.Acknowledge(messageId);
+
             await _connection.Send(command, cancellationToken).ConfigureAwait(false);
         }
 

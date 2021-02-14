@@ -103,7 +103,7 @@ namespace DotPulsar.Internal
         public async ValueTask AcknowledgeCumulative(MessageId messageId, CancellationToken cancellationToken)
             => await Acknowledge(messageId, CommandAck.AckType.Cumulative, cancellationToken).ConfigureAwait(false);
 
-        public async ValueTask RedeliverUnacknowledgedMessages(IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
+        public async ValueTask RedeliverUnacknowledgedMessages(IEnumerable<MessageIdData> messageIds, CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
 
@@ -111,6 +111,9 @@ namespace DotPulsar.Internal
             command.MessageIds.AddRange(messageIds.Select(messageId => messageId.ToMessageIdData()));
             await _executor.Execute(() => RedeliverUnacknowledgedMessages(command, cancellationToken), cancellationToken).ConfigureAwait(false);
         }
+
+        public async ValueTask RedeliverUnacknowledgedMessages(IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
+            => await RedeliverUnacknowledgedMessages(messageIds.Select(m => m.Data), cancellationToken).ConfigureAwait(false);
 
         public async ValueTask RedeliverUnacknowledgedMessages(CancellationToken cancellationToken)
             => await RedeliverUnacknowledgedMessages(Enumerable.Empty<MessageId>(), cancellationToken).ConfigureAwait(false);

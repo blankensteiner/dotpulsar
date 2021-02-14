@@ -14,6 +14,7 @@
 
 namespace DotPulsar.Abstractions
 {
+    using DotPulsar.Internal.PulsarApi;
     using System;
     using System.Collections.Generic;
     using System.Threading;
@@ -58,6 +59,11 @@ namespace DotPulsar.Abstractions
         /// Redeliver the pending messages that were pushed to this consumer that are not yet acknowledged.
         /// </summary>
         ValueTask RedeliverUnacknowledgedMessages(IEnumerable<MessageId> messageIds, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Redeliver the pending messages that were pushed to this consumer that are not yet acknowledged.
+        /// </summary>
+        ValueTask RedeliverUnacknowledgedMessages(IEnumerable<MessageIdData> messageIds, CancellationToken cancellationToken);
 
         /// <summary>
         /// Redeliver all pending messages that were pushed to this consumer that are not yet acknowledged.

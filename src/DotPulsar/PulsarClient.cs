@@ -81,11 +81,15 @@ namespace DotPulsar
             ThrowIfDisposed();
             var correlationId = Guid.NewGuid();
             var executor = new Executor(correlationId, _processManager, _exceptionHandler);
-            var factory = new ConsumerChannelFactory(correlationId, _processManager, _connectionPool, executor, options);
             var stateManager = new StateManager<ConsumerState>(ConsumerState.Disconnected, ConsumerState.Closed, ConsumerState.ReachedEndOfTopic, ConsumerState.Faulted);
             var consumer = new Consumer(correlationId, ServiceUrl, options.SubscriptionName, options.Topic, _processManager, new NotReadyChannel(), executor, stateManager);
             if (options.StateChangedHandler is not null)
                 _ = StateMonitor.MonitorConsumer(consumer, options.StateChangedHandler);
+            IUnacknowledgedMessageTracker unackedTracker = options.AcknowledgementTimeout == default
+                ? new InactiveUnackedMessageTracker()
+                : new UnackedMessageTracker(options.AcknowledgementTimeout, TimeSpan.FromSeconds(1));
+            unackedTracker.Start(consumer);
+            var factory = new ConsumerChannelFactory(correlationId, _processManager, _connectionPool, executor, options, unackedTracker);
             var process = new ConsumerProcess(correlationId, stateManager, factory, consumer, options.SubscriptionType == SubscriptionType.Failover);
             _processManager.Add(process);
             process.Start();
